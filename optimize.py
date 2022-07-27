@@ -102,6 +102,8 @@ def find_planet_center(n, surface_refs, positions):
     gain = 0.01
     for i in range(n):
         avg_error = list()
+        if i == n - 1:
+            print("\n")
         for ref_a in surface_refs:
             for ref_b in surface_refs:
                 if ref_a == ref_b:
@@ -116,7 +118,7 @@ def find_planet_center(n, surface_refs, positions):
             pos = pos - gain * (error_b / 2) * direction_b
             avg_error.append(abs(dist_a - dist_b))
             if i == n-1:
-                print("\n", ref_a, ref_b, abs(dist_a - dist_b))
+                print(ref_a, ref_b, abs(dist_a - dist_b))
         if i == 0:
             print("Initial error:", np.mean(avg_error), "\n")
         # Log progress

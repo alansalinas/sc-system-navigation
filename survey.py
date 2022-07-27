@@ -1,15 +1,16 @@
 import sys
 import numpy as np
-from optimize import optimize_distances, optimize_angles, find_planet_center
-from geometry import shift_to_center
+from optimize import optimize_distances, optimize_angles, find_planet_center, get_coords
 from utils import load_positions, save_positions, validate
+from planetary import planet_radius
 from survey_data.hurston import (
     refs,
     surface_refs,
     distances,
     headings,
     pitches,
-    origin
+    origin,
+    north
 )
 
 
@@ -45,17 +46,30 @@ def command_angles(n):
     return positions
 
 
-def command_planet_origin():
+def command_add_planet_data():
     positions = load_positions("maps/hurston_angle.pickle")
-    center = find_planet_center(1000, surface_refs, positions)
-    positions = shift_to_center(positions, center)
-    print("Found planetary center:", origin)
-    save_positions(positions, "maps/hurston.pickle")
+    # Get planet's center
+    center = find_planet_center(10000, surface_refs, positions)
+    print("Found planetary center:", center)
+    # Get planet's radius
+    radius = planet_radius(surface_refs, positions, center)
+    print("Found planetary radius:", radius)
+    # Get north position
+    north_pos = get_coords(positions, north)
+    print("North position:", north_pos)
+    data = {
+        "positions": positions,
+        "planet": {
+            "center": center,
+            "radius": radius,
+            "north": north_pos,
+        }
+    }
+    save_positions(data, "maps/hurston.pickle")
     
 
 def command_make_map():
     pass
-
 
 
 if __name__ == "__main__":
@@ -66,7 +80,7 @@ if __name__ == "__main__":
     elif command == "angles":
         n = int(sys.argv[2])
         command_angles(n)
-    elif command == "origin":
-        command_planet_origin()
+    elif command == "planet":
+        command_add_planet_data()
     elif command == "map":
         command_make_map()

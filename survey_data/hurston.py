@@ -108,3 +108,13 @@ pitches = {
     "OM-5": -18,
     "OM-6": -6,
 }
+
+# North point
+north = {
+    "HDMS-Pinewood": 1302,
+    "HDMS-Stanhope": 715.524,
+    "HDMS-Thedus": 1308,
+    "HDMS-Oparei": 1913,
+    "HDMS-Hadley": 1760,
+    "HDMS-Edmond": 912.756,
+}
