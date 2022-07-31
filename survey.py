@@ -1,16 +1,17 @@
 import sys
 import numpy as np
-from optimize import optimize_distances, optimize_angles, find_planet_center, get_coords
+from optimize import optimize_distances, optimize_angles, find_planet_centroid, get_coords
 from utils import load_positions, save_positions, validate
-from planetary import planet_radius
+from planetary import get_planet_vectors
 from survey_data.hurston import (
     refs,
-    surface_refs,
+    orbital_refs,
     distances,
     headings,
     pitches,
     origin,
-    north
+    north,
+    radius
 )
 
 
@@ -49,20 +50,23 @@ def command_angles(n):
 def command_add_planet_data():
     positions = load_positions("maps/hurston_angle.pickle")
     # Get planet's center
-    center = find_planet_center(10000, surface_refs, positions)
-    print("Found planetary center:", center)
-    # Get planet's radius
-    radius = planet_radius(surface_refs, positions, center)
-    print("Found planetary radius:", radius)
+    centroid = find_planet_centroid(10000, orbital_refs, positions)
+    print("Found planetary center:", centroid)
+    print("Defined planetary radius:", radius)
     # Get north position
     north_pos = get_coords(positions, north)
     print("North position:", north_pos)
+    # Get planet vectors
+    north_vector, prime_meridian, parallel_zero = get_planet_vectors(north_pos, centroid)
+    
     data = {
         "positions": positions,
         "planet": {
-            "center": center,
+            "centroid": centroid,
             "radius": radius,
-            "north": north_pos,
+            "north_vector": north_vector,
+            "prime_meridian": prime_meridian,
+            "parallel_zero": parallel_zero,
         }
     }
     save_positions(data, "maps/hurston.pickle")

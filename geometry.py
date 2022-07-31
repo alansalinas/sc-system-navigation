@@ -60,7 +60,7 @@ def unit_vector(v):
 def rotate_on_vector(k, v, theta):
     """
     Rotate vector v around vector k by angle theta
-    :param k: Axis of rotation vector
+    :param k: Axis of rotation vector (unit)
     :param v: Vector to rotate around k
     :param theta: Angle to rotate in radians
     """
@@ -86,4 +86,4 @@ def rotate_positions(positions, k, theta, origin, in_place=False):
 def shift_to_center(positions, center):
     for ref in positions:
         positions[ref] = positions[ref] - center
-    return positions 
+    return positions

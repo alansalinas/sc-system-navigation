@@ -93,11 +93,11 @@ def get_coords(positions, data):
             direction = (pos - positions[key]) / dist_estimated
             dist_error = dist_estimated - data[key]
             pos = pos - gain * (dist_error / 2) * direction
-    assert dist_error < 1e-3
+    assert dist_error < 0.5
     return pos
 
 
-def find_planet_center(n, surface_refs, positions):
+def find_planet_centroid(n, surface_refs, positions):
     pos = np.random.rand(3).astype(np.longdouble)
     gain = 0.01
     for i in range(n):

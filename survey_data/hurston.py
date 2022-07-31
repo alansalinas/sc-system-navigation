@@ -118,3 +118,9 @@ north = {
     "HDMS-Hadley": 1760,
     "HDMS-Edmond": 912.756,
 }
+
+radius = 1000
+
+
+# NEAR Edmond
+# H 25, P -44
