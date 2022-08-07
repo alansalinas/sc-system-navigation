@@ -1,5 +1,5 @@
 import numpy as np
-from geometry import euclidean_distance, unit_vector, radians_to_degrees
+from geometry import euclidean_distance, unit_vector, radians_to_degrees, to_rectangular
 
 
 def estimate_planet_radius(surface_refs, positions, centroid):
@@ -10,11 +10,11 @@ def estimate_planet_radius(surface_refs, positions, centroid):
     return dist / len(surface_refs)
 
 
-def get_planet_vectors(north, centroid):
-    north_vector = unit_vector(north - centroid)
+def get_planet_vectors(north):
+    north_vector = unit_vector(north)
     prime_meridian = unit_vector(np.array([-north_vector[1], north_vector[0], 0]))
     parallel_zero = np.cross(prime_meridian, north_vector)
-    assert np.linalg.norm(parallel_zero) == 1
+    assert np.isclose(np.linalg.norm(parallel_zero), 1)
     return north_vector, prime_meridian, parallel_zero
 
 
@@ -32,6 +32,21 @@ def get_planetary_coords(pos, centroid, radius, north_vector, prime_meridian, pa
     alt -= radius
     return np.array([alt, lon, lat])
 
+
+def get_xyz_vectors(north_vector, prime_meridian, parallel_zero):
+    centroid = np.array([0, 0, 0])
+    x_vector = get_planetary_coords(np.array([1, 0, 0], dtype="float128"), centroid, 0, north_vector, prime_meridian, parallel_zero)
+    y_vector = get_planetary_coords(np.array([0, 1, 0], dtype="float128"), centroid, 0, north_vector, prime_meridian, parallel_zero)
+    z_vector = get_planetary_coords(np.array([0, 0, 1], dtype="float128"), centroid, 0, north_vector, prime_meridian, parallel_zero)
+    x_vector = unit_vector(to_rectangular(x_vector))
+    y_vector = unit_vector(to_rectangular(y_vector))
+    z_vector = unit_vector(to_rectangular(z_vector))
+    assert np.linalg.norm(x_vector) == 1
+    assert np.linalg.norm(y_vector) == 1
+    assert np.linalg.norm(z_vector) == 1
+    
+    return x_vector, y_vector, z_vector
+    
 
 def surface_distance(a, b, radius):
     '''
@@ -55,7 +70,7 @@ def find_bearing(a, b):
     _, lon_b, lat_b = list(b)
     bearing = np.arctan2(
         np.cos(lat_b) * np.sin(lon_b - lon_a),
-        np.cos(lat_a)*np.sin(lat_b) - np.sin(lat_a) * np.cos(lat_b)*np.cos(lon_b - lon_a)
+        np.cos(lat_a) * np.sin(lat_b) - np.sin(lat_a) * np.cos(lat_b) * np.cos(lon_b - lon_a)
     )
     return bearing
 

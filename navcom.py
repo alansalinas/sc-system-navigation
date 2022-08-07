@@ -8,8 +8,8 @@ from geometry import (
 )
 from utils import load_positions
 from optimize import get_coords
-from planetary import get_atmosphere_vector, get_planetary_coords
-from survey_data.hurston import orbital_refs
+from planetary import get_atmosphere_vector, get_planetary_coords, get_xyz_vectors
+from survey_data.hurston import refs
 
 
 data = load_positions("maps/hurston.pickle")
@@ -32,8 +32,8 @@ def command_get_pos_ref(ref):
     print("North", north_vector)
     print(ref, positions[ref])
     print("center", centroid)
-    
-    
+
+
 def command_get_planetary_coords(file):
     data = pd.read_csv(file).to_dict(orient="records")
     data = {item["ref"]: item["distance"] for item in data}
@@ -76,17 +76,49 @@ def command_get_atmosphere_vector(file_a, file_b):
     print("Pitch:", vector[2])
 
 
-def command_get_nearest_om(file):
+def command_get_nearest_ref(file):
     data = pd.read_csv(file).to_dict(orient="records")
     data = {item["ref"]: item["distance"] for item in data}
     pos = get_coords(positions, data)
     best_dist = 1e6
-    for ref in orbital_refs:
+    for ref in refs:
         dist = abs(euclidean_distance(pos, positions[ref]))
         if dist < best_dist:
             best_dist = dist
             om = ref
     print("Nearest:", om)
+    print("Dist", best_dist)
+    
+
+def command_write_positions():
+    records = list()
+    for ref in positions:
+        pos = positions[ref]
+        r = {
+            "ref": ref,
+            "x": pos[0],
+            "y": pos[1],
+            "z": pos[2]
+        }
+        records.append(r)
+    df = pd.DataFrame(records)
+    df.to_csv("hurston.csv", index=False)
+    
+    
+def command_planet_data():
+    x_vector, y_vector, z_vector = get_xyz_vectors(north_vector, prime_meridian, parallel_zero)
+    data = [
+        ["radius", radius, 0, 0],
+        ["centroid", centroid[0], centroid[1], centroid[2]],
+        ["north_vector", north_vector[0], north_vector[1], north_vector[2]],
+        ["prime_meridian", prime_meridian[0], prime_meridian[1], prime_meridian[2]],
+        ["parallel_zero", parallel_zero[0], parallel_zero[1], parallel_zero[2]],
+        ["x_vector", x_vector[0], x_vector[1], x_vector[2]],
+        ["y_vector", y_vector[0], y_vector[1], y_vector[2]],
+        ["z_vector", z_vector[0], z_vector[1], z_vector[2]],
+    ]
+    df = pd.DataFrame(data)
+    df.to_csv("hurston_data.csv", index=None, header=None)
 
 
 if __name__ == "__main__":
@@ -105,6 +137,10 @@ if __name__ == "__main__":
     elif command == "pcoords":
         file = sys.argv[2]
         command_get_planetary_coords(file)
-    elif command == "om":
+    elif command == "nearest":
         file = sys.argv[2]
-        command_get_nearest_om(file)
+        command_get_nearest_ref(file)
+    elif command == "write":
+        command_write_positions()
+    elif command == "data":
+        command_planet_data()
