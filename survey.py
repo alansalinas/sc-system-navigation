@@ -57,7 +57,8 @@ def command_add_planet_data():
     north_pos = get_coords(positions, north)
     print("North position:", north_pos)
     # Get planet vectors
-    north_vector, prime_meridian, parallel_zero = get_planet_vectors(north_pos)
+    north_vector, prime_meridian, parallel_zero = get_planet_vectors(north_pos, centroid)
+    print("North vector:", north_vector)
     
     data = {
         "positions": positions,

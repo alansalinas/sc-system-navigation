@@ -10,8 +10,8 @@ def estimate_planet_radius(surface_refs, positions, centroid):
     return dist / len(surface_refs)
 
 
-def get_planet_vectors(north):
-    north_vector = unit_vector(north)
+def get_planet_vectors(north, centroid):
+    north_vector = unit_vector(north - centroid)
     prime_meridian = unit_vector(np.array([-north_vector[1], north_vector[0], 0]))
     parallel_zero = np.cross(prime_meridian, north_vector)
     assert np.isclose(np.linalg.norm(parallel_zero), 1)
